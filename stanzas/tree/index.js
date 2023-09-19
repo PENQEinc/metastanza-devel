@@ -473,6 +473,8 @@ export default class Tree extends MetaStanza {
         // Decorate labels
         nodeLabelsEnter
           .append("a")
+          .attr("href", (d) => d.data.url)
+          .attr("target", "_blank")
           .style("text-decoration", "underline")
           .append("text")
           .attr("x", (d) => {
