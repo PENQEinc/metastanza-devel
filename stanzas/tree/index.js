@@ -471,93 +471,57 @@ export default class Tree extends MetaStanza {
           });
 
         // Decorate labels
+        const decolateLabel = (selection) => {
+          select(selection)
+            .append("text")
+            .attr("x", (d) => {
+              switch (layout) {
+                case HORIZONTAL:
+                  return d.children || d._children ? -labelMargin : labelMargin;
+                case VERTICAL:
+                  return d.children || d._children ? labelMargin : -labelMargin;
+                case RADIAL:
+                  return d.x < Math.PI === !d.children
+                    ? labelMargin
+                    : -labelMargin;
+              }
+            })
+            .attr("dy", "3")
+            .attr("transform", (d) => {
+              switch (layout) {
+                case HORIZONTAL:
+                  return "rotate(0)";
+                case VERTICAL:
+                  return "rotate(-90)";
+                case RADIAL:
+                  return `rotate(${d.x >= Math.PI ? 180 : 0})`;
+              }
+            })
+            .attr("text-anchor", (d) => {
+              switch (layout) {
+                case HORIZONTAL:
+                  return d.children || d._children ? "end" : "start";
+                case VERTICAL:
+                  return d.children || d._children ? "start" : "end";
+                case RADIAL:
+                  return d.x < Math.PI === !d.children ? "start" : "end";
+              }
+            })
+            .text((d) => d.data.label || "");
+        };
+
+        //Whether to append a depending on whether there is a url or not
         nodeLabelsEnter.each((d, i, g) => {
           if (d.data.url) {
             select(g[i])
               .append("a")
               .attr("href", (d) => d.data.url)
               .attr("target", "_blank")
-              .style("text-decoration", "underline")
-              .append("text")
-              .attr("x", (d) => {
-                switch (layout) {
-                  case HORIZONTAL:
-                    return d.children || d._children
-                      ? -labelMargin
-                      : labelMargin;
-                  case VERTICAL:
-                    return d.children || d._children
-                      ? labelMargin
-                      : -labelMargin;
-                  case RADIAL:
-                    return d.x < Math.PI === !d.children
-                      ? labelMargin
-                      : -labelMargin;
-                }
-              })
-              .attr("dy", "3")
-              .attr("transform", (d) => {
-                switch (layout) {
-                  case HORIZONTAL:
-                    return "rotate(0)";
-                  case VERTICAL:
-                    return "rotate(-90)";
-                  case RADIAL:
-                    return `rotate(${d.x >= Math.PI ? 180 : 0})`;
-                }
-              })
-              .attr("text-anchor", (d) => {
-                switch (layout) {
-                  case HORIZONTAL:
-                    return d.children || d._children ? "end" : "start";
-                  case VERTICAL:
-                    return d.children || d._children ? "start" : "end";
-                  case RADIAL:
-                    return d.x < Math.PI === !d.children ? "start" : "end";
-                }
-              })
-              .text((d) => d.data.label || "");
+              .style("text-decoration", "underline");
+
+            decolateLabel(g[i].querySelector("a"));
           } else {
-            select(g[i])
-              .append("text")
-              .attr("x", (d) => {
-                switch (layout) {
-                  case HORIZONTAL:
-                    return d.children || d._children
-                      ? -labelMargin
-                      : labelMargin;
-                  case VERTICAL:
-                    return d.children || d._children
-                      ? labelMargin
-                      : -labelMargin;
-                  case RADIAL:
-                    return d.x < Math.PI === !d.children
-                      ? labelMargin
-                      : -labelMargin;
-                }
-              })
-              .attr("dy", "3")
-              .attr("transform", (d) => {
-                switch (layout) {
-                  case HORIZONTAL:
-                    return "rotate(0)";
-                  case VERTICAL:
-                    return "rotate(-90)";
-                  case RADIAL:
-                    return `rotate(${d.x >= Math.PI ? 180 : 0})`;
-                }
-              })
-              .attr("text-anchor", (d) => {
-                switch (layout) {
-                  case HORIZONTAL:
-                    return d.children || d._children ? "end" : "start";
-                  case VERTICAL:
-                    return d.children || d._children ? "start" : "end";
-                  case RADIAL:
-                    return d.x < Math.PI === !d.children ? "start" : "end";
-                }
-              })
-              .text((d) => d.data.label || "");
+            decolateLabel(g[i]);
           }
         });
 
