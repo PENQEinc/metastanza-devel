@@ -57,6 +57,7 @@ export default class Tree extends MetaStanza {
         nodeValueKey: this.params["node-size-key"].trim(),
         nodeDescriptionKey: this.params["tooltips-key"].trim(),
       }).data,
+      urlKey = this.params["node-url-key"].trim(), //Actually want to include it in asTree
       width = parseFloat(this.css("--togostanza-canvas-width")) || 0,
       height = parseFloat(this.css("--togostanza-canvas-height")) || 0,
       padding = this.MARGIN,
@@ -91,6 +92,12 @@ export default class Tree extends MetaStanza {
     const showToolTips = dataset.some((item) => item.description);
     this.tooltip = new ToolTip();
     root.append(this.tooltip);
+
+    //Add url property to dataset. Actually want to include it in asTree
+    const urls = this._data.map((datum) => datum.url);
+    dataset.forEach((datum, index) => {
+      datum[urlKey] = urls[index];
+    });
 
     //Sorting by user keywords
     const orderSym = Symbol("order");
@@ -463,8 +470,10 @@ export default class Tree extends MetaStanza {
             }
           });
 
-        //Decorate labels
+        // Decorate labels
         nodeLabelsEnter
+          .append("a")
+          .style("text-decoration", "underline")
           .append("text")
           .attr("x", (d) => {
             switch (layout) {
